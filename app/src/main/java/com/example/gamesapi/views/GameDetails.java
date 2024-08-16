@@ -35,6 +35,7 @@ public class GameDetails extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private Gson gson;
     private List<Game> favoriteGames;
+    private boolean isFavorite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,20 +80,21 @@ public class GameDetails extends AppCompatActivity {
                     .error(R.drawable.images) // Imagen por defecto en caso de error
                     .into(gameImageView);
 
-            // Logs para depuración
-            Log.d("GameDetails", "Title: " + game.getTitle());
-            Log.d("GameDetails", "Short Description: " + game.getShortDescription());
-            Log.d("GameDetails", "Game URL: " + game.getGameUrl());
-            Log.d("GameDetails", "Genre: " + game.getGenre());
-            Log.d("GameDetails", "Platform: " + game.getPlatform());
-            Log.d("GameDetails", "Publisher: " + game.getPublisher());
-            Log.d("GameDetails", "Developer: " + game.getDeveloper());
-            Log.d("GameDetails", "Release Date: " + game.getReleaseDate());
+            // Verificar si el juego ya está en favoritos
+            isFavorite = isGameFavorite(game);
+
+            // Establecer el ícono del botón de favoritos dependiendo del estado
+            updateFavoriteIcon();
 
             addFavoritesImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    addToFavorites(game);
+                    if (isFavorite) {
+                        removeFromFavorites(game);
+                    } else {
+                        addToFavorites(game);
+                    }
+                    updateFavoriteIcon();
                     Intent intent = new Intent(GameDetails.this, FavoriteGamesActivity.class);
                     startActivity(intent);
                 }
@@ -112,11 +114,44 @@ public class GameDetails extends AppCompatActivity {
         }
     }
 
+    private boolean isGameFavorite(Game game) {
+        for (Game favoriteGame : favoriteGames) {
+            if (favoriteGame.getId() == game.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void addToFavorites(Game game) {
         favoriteGames.add(game);
+        saveFavorites();
+        isFavorite = true;
+    }
+
+    private void removeFromFavorites(Game game) {
+        for (int i = 0; i < favoriteGames.size(); i++) {
+            if (favoriteGames.get(i).getId() == game.getId()) {
+                favoriteGames.remove(i);
+                break;
+            }
+        }
+        saveFavorites();
+        isFavorite = false;
+    }
+
+    private void saveFavorites() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         String json = gson.toJson(favoriteGames);
         editor.putString("favorite_games", json);
         editor.apply();
+    }
+
+    private void updateFavoriteIcon() {
+        if (isFavorite) {
+            addFavoritesImageView.setImageResource(R.drawable.ic_favoritos); // Cambia esto al ícono de agregado
+        } else {
+            addFavoritesImageView.setImageResource(R.drawable.ic_favoritos); // Cambia esto al ícono de eliminado
+        }
     }
 }
