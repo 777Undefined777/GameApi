@@ -1,6 +1,7 @@
 package com.example.gamesapi.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,7 @@ public class GamesAdapter extends RecyclerView.Adapter<GamesAdapter.GameViewHold
     @NonNull
     @Override
     public GameViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_game, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_game, parent, false);
         return new GameViewHolder(view);
     }
 
@@ -34,7 +35,18 @@ public class GamesAdapter extends RecyclerView.Adapter<GamesAdapter.GameViewHold
     public void onBindViewHolder(@NonNull GameViewHolder holder, int position) {
         Game game = games.get(position);
         holder.titleTextView.setText(game.getTitle());
-        Glide.with(context).load(game.getThumbnail()).into(holder.thumbnailImageView);
+
+        Glide.with(context)
+                .load(game.getThumbnail())
+                .placeholder(R.drawable.images)
+                .error(R.drawable.images)
+                .into(holder.thumbnailImageView);
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, GameDetails.class);
+            intent.putExtra("game", game);  // Pasar el objeto Game a GameDetails
+            context.startActivity(intent);
+        });
     }
 
     @Override
@@ -42,15 +54,15 @@ public class GamesAdapter extends RecyclerView.Adapter<GamesAdapter.GameViewHold
         return games.size();
     }
 
-    public static class GameViewHolder extends RecyclerView.ViewHolder {
+    static class GameViewHolder extends RecyclerView.ViewHolder {
 
-        TextView titleTextView;
         ImageView thumbnailImageView;
+        TextView titleTextView;
 
         public GameViewHolder(@NonNull View itemView) {
             super(itemView);
-            titleTextView = itemView.findViewById(R.id.titleTextView);
             thumbnailImageView = itemView.findViewById(R.id.thumbnailImageView);
+            titleTextView = itemView.findViewById(R.id.titleTextView);
         }
     }
 }
