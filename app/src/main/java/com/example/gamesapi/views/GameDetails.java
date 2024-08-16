@@ -1,17 +1,29 @@
 package com.example.gamesapi.views;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.bumptech.glide.Glide;
 import com.example.gamesapi.R;
 import com.example.gamesapi.models.Game;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameDetails extends AppCompatActivity {
 
-    private ImageView gameImageView;
+    private ImageView gameImageView, addFavoritesImageView;
     private TextView titleTextView;
     private TextView shortDescriptionTextView;
     private TextView gameUrlTextView;
@@ -20,6 +32,9 @@ public class GameDetails extends AppCompatActivity {
     private TextView publisherTextView;
     private TextView developerTextView;
     private TextView releaseDateTextView;
+    private SharedPreferences sharedPreferences;
+    private Gson gson;
+    private List<Game> favoriteGames;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +51,14 @@ public class GameDetails extends AppCompatActivity {
         publisherTextView = findViewById(R.id.publisherTextView);
         developerTextView = findViewById(R.id.developerTextView);
         releaseDateTextView = findViewById(R.id.releaseDateTextView);
+        addFavoritesImageView = findViewById(R.id.addfavorites);
 
-        // Obtener el juego desde el intent
+        sharedPreferences = getSharedPreferences("favorites", Context.MODE_PRIVATE);
+        gson = new Gson();
+
+        // Cargar la lista de favoritos existente
+        loadFavorites();
+
         Game game = getIntent().getParcelableExtra("game");
 
         if (game != null) {
@@ -67,8 +88,35 @@ public class GameDetails extends AppCompatActivity {
             Log.d("GameDetails", "Publisher: " + game.getPublisher());
             Log.d("GameDetails", "Developer: " + game.getDeveloper());
             Log.d("GameDetails", "Release Date: " + game.getReleaseDate());
+
+            addFavoritesImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    addToFavorites(game);
+                    Intent intent = new Intent(GameDetails.this, FavoriteGamesActivity.class);
+                    startActivity(intent);
+                }
+            });
         } else {
             Log.e("GameDetails", "Game object is null");
         }
+    }
+
+    private void loadFavorites() {
+        String json = sharedPreferences.getString("favorite_games", null);
+        Type type = new TypeToken<ArrayList<Game>>() {}.getType();
+        favoriteGames = gson.fromJson(json, type);
+
+        if (favoriteGames == null) {
+            favoriteGames = new ArrayList<>();
+        }
+    }
+
+    private void addToFavorites(Game game) {
+        favoriteGames.add(game);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        String json = gson.toJson(favoriteGames);
+        editor.putString("favorite_games", json);
+        editor.apply();
     }
 }
