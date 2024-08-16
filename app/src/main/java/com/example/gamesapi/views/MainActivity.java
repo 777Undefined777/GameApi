@@ -3,7 +3,7 @@ package com.example.gamesapi.views;
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.gamesapi.R;
 import com.example.gamesapi.models.Game;
@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
         setContentView(R.layout.activity_main);
 
         recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2)); // Cambiado a GridLayoutManager con 2 columnas
 
         gamesPresenter = new GamesPresenterImpl(this, RetrofitClient.getGamesApi());
         gamesPresenter.getGames();
