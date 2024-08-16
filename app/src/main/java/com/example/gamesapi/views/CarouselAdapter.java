@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
@@ -36,7 +36,7 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.Carous
     @Override
     public void onBindViewHolder(@NonNull CarouselViewHolder holder, int position) {
         Game game = games.get(position);
-        holder.carouselTextView.setText(game.getTitle());
+
         Glide.with(context)
                 .load(game.getThumbnail())
                 .into(holder.carouselImageView);
@@ -49,12 +49,12 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.Carous
 
     public static class CarouselViewHolder extends RecyclerView.ViewHolder {
         ImageView carouselImageView;
-        TextView carouselTextView;
+
 
         public CarouselViewHolder(@NonNull View itemView) {
             super(itemView);
             carouselImageView = itemView.findViewById(R.id.carouselImageView);
-            carouselTextView = itemView.findViewById(R.id.carouselTextView);
+
         }
     }
 }

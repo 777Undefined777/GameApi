@@ -13,12 +13,4 @@
         android:scaleType="centerCrop"
         />
 
-    <TextView
-        android:id="@+id/carouselTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textSize="14sp"
-        android:text="Game Name"
-        android:textColor="@android:color/black"/>
 </LinearLayout>
